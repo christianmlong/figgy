@@ -1,0 +1,19 @@
+
+Notes from the figgy project
+
+2015-04-08 14:33
+
+Other ways of handling conflict
+
+0) Before import, do a data scrub on the xml, validate that there is no conflict and bad data in the data file(s).
+1) Run through publisher records one at a time.
+
+
+Relevant experience
+APVU - wrote a whole validation and import system for Accounts Receivable EDI data. Every record was marked as bad or good, good records were further batched for import, bad records were displayed with an informative message.
+Each individual record was validated. Then, the batch as a whole was validated, to look for conflicts and inconsistencies.
+
+
+Other considerations
+What about ISBN conflicts?
+The publisher supplies us an id, but we probably can't assume that it is unique for that publisher. They may have duplicates.
