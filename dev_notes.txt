@@ -23,4 +23,3 @@ ALLOWED_HOSTS = ['localhost', '127.0.0.1', '192.168.56.20']
 python manage.py runserver 192.168.56.20:8000 &
 
 git pull --rebase upstream master && python setup.py develop --always-unzip && python manage.py syncdb --noinput
-
