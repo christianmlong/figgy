@@ -17,3 +17,45 @@ Each individual record was validated. Then, the batch as a whole was validated, 
 Other considerations
 What about ISBN conflicts?
 The publisher supplies us an id, but we probably can't assume that it is unique for that publisher. They may have duplicates.
+
+
+============
+2015-04-13 12:34
+
+Problems with the data
+
+Book 1
+Book ID changes from "book-1" to 10000000000001
+Version changes from 1 to 2
+Add a Proprietary alias of 12345ABC
+
+Book 2
+Version changes from 1 to 2
+Adds alias Proprietary, Unknown Type 12345ABC
+Adds an ISBN-13 alias that conflicts with book 1 alias and with book 1 isbn number
+
+Book 3
+Id changes from book-3 to 12345ABC. This conflicts with book 1 alias and book 2 alias
+No version number in update
+
+Solutions
+
+Versions
+Have a publisher version field and our own version field. Auto-increment our version field.
+
+when processing an insert record, check for collisions
+    Id against existing ids
+    Id against existing aliases
+    Each alias against existing ids
+    Each alias against existing aliases
+
+If a collision is found, print an informative error, and skip that record.
+
+
+
+More elaborate solution:
+Create a model for publisher record: Date, status, errore message, xml
+Import all the updates in to a batch of publisher records
+Validate the whole batch, looking for conflicts before import
+Import the batch. Any publisher records that cause errors are rolled back, and get an error message.
+Provide a view to display errors and conflicts in publisher imports, and a way to resolve them.
