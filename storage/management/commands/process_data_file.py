@@ -20,5 +20,7 @@ class Command(BaseCommand):
                 try:
                     storage.tools.process_book_element(book_node)
                 except storage.tools.ImportError as err:
-                    print "Error when importing %s into database." % filename
+                    print("Error when importing {} into "
+                          "database.".format(filename))
                     print("Error details {}".format(err.message))
+                    print("\n\n")
