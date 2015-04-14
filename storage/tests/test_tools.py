@@ -37,6 +37,17 @@ class TestTools(TestCase):
         self.assertEqual(Alias.objects.get(scheme='ISBN-10').value, '0158757819')
         self.assertEqual(Alias.objects.get(scheme='ISBN-13').value, '0000000000123')
 
+    def test_storage_tools_process_book_element_idempotent(self):
+        '''process_book_element should be idempotent.'''
+
+        xml = etree.fromstring(self.xml_str)
+        storage.tools.process_book_element(xml)
+        # Do it again
+        storage.tools.process_book_element(xml)
+
+        self.assertEqual(Book.objects.count(), 1)
+        book = Book.objects.get(pk='12345')
+
     def test_iter_aliases(self):
         '''iter_aliases should provide an iterator over the aliases'''
 
@@ -50,6 +61,24 @@ class TestTools(TestCase):
         self.assertEqual(value, '0000000000123')
         with self.assertRaises(StopIteration):
             aliases.next()
+
+    def test_storage_tools_check_id_alias_conflict(self):
+        '''check_id_alias_conflict should catch conflicts'''
+
+        xml = etree.fromstring(self.xml_str)
+        storage.tools.process_book_element(xml)
+
+        xml_str_with_conflict = '''
+        <book id="0158757819">
+            <title>Another title</title>
+            <aliases>
+                <alias scheme="ISBN-13" value="0000000000456"/>
+            </aliases>
+        </book>
+        '''
+        xml_with_conflict = etree.fromstring(xml_str_with_conflict)
+        with self.assertRaises(storage.tools.ImportError):
+            storage.tools.process_book_element(xml_with_conflict)
 
 
 

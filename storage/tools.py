@@ -2,7 +2,7 @@
 # Created by David Rideout <drideout@safaribooksonline.com> on 2/7/14 4:58 PM
 # Copyright (c) 2013 Safari Books Online, LLC. All rights reserved.
 
-from storage.models import Book
+from storage.models import Book, Alias
 
 
 def process_book_element(book_element):
@@ -48,7 +48,7 @@ def validate_book_element(book_element):
     :returns:
     """
     list_of_conflict_messages = []
-    list_of_conflict_messages.extend(check_id_id_conflict(book_element))
+    # list_of_conflict_messages.extend(check_id_id_conflict(book_element))
     list_of_conflict_messages.extend(check_id_alias_conflict(book_element))
     list_of_conflict_messages.extend(check_alias_id_conflict(book_element))
     list_of_conflict_messages.extend(check_alias_alias_conflict(book_element))
@@ -58,19 +58,42 @@ def validate_book_element(book_element):
         err_msg += "\n".join(list_of_conflict_messages)
         raise ImportError(err_msg)
 
-def check_id_id_conflict(book_element):
-    """
-    Return a list of error messages if book_element has an id that conflicts
-    with an existing book id in the database.
-    """
-    return []
+# def check_id_id_conflict(book_element):
+#     """
+#     Return a list of error messages if book_element has an id that conflicts
+#     with an existing book id in the database.
+#
+#     Of course, this could be just a regular update of an existing book, so this
+#     function only returns an error message if the amount of changes exceeds some
+#     threshhold value.
+#     """
+#     # TODO implement
+#     return []
 
 def check_id_alias_conflict(book_element):
     """
     Return a list of error messages if book_element has an id that conflicts
     with an existing book alias in the database.
     """
-    return []
+
+    candidate_id = book_element.get('id')
+
+    # Find all the aliase of all the books that are not this book.
+    possible_aliases = Alias.objects.exclude(book__pk=candidate_id)
+
+    import_errors = []
+    for alias in possible_aliases:
+        if alias.value == candidate_id:
+            # Found a conflict
+            err_msg = ("Imported data {} conflicts with existing alias (scheme "
+                       "{} value {}) for book id {}".format(candidate_id,
+                                                            alias.scheme,
+                                                            alias.value,
+                                                            alias.book.id,
+                                                           )
+                      )
+            import_errors.append(err_msg)
+    return import_errors
 
 def check_alias_id_conflict(book_element):
     """
