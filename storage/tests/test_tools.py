@@ -9,23 +9,24 @@ import storage.tools
 
 
 class TestTools(TestCase):
+
+    xml_str = '''
+    <book id="12345">
+        <title>A title</title>
+        <aliases>
+            <alias scheme="ISBN-10" value="0158757819"/>
+            <alias scheme="ISBN-13" value="0000000000123"/>
+        </aliases>
+    </book>
+    '''
+
     def setUp(self):
         pass
 
     def test_storage_tools_process_book_element_db(self):
         '''process_book_element should put the book in the database.'''
 
-        xml_str = '''
-        <book id="12345">
-            <title>A title</title>
-            <aliases>
-                <alias scheme="ISBN-10" value="0158757819"/>
-                <alias scheme="ISBN-13" value="0000000000123"/>
-            </aliases>
-        </book>
-        '''
-
-        xml = etree.fromstring(xml_str)
+        xml = etree.fromstring(self.xml_str)
         storage.tools.process_book_element(xml)
 
         self.assertEqual(Book.objects.count(), 1)
