@@ -41,3 +41,5 @@ nosetests.xml
 
 _local_tests.py
 .ropeproject
+/storage/migrations
+
