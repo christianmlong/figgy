@@ -2,6 +2,7 @@
 # Created by David Rideout <drideout@safaribooksonline.com> on 2/7/14 4:58 PM
 # Copyright (c) 2013 Safari Books Online, LLC. All rights reserved.
 
+from django.db.utils import IntegrityError
 from storage.models import Book, Alias
 
 
@@ -18,7 +19,13 @@ def process_book_element(book_element):
     book.description = book_element.findtext('description')
 
     for scheme, value in iter_aliases(book_element):
-        book.aliases.get_or_create(scheme=scheme, value=value)
+        try:
+            book.aliases.get_or_create(scheme=scheme, value=value)
+        except IntegrityError as err:
+            err_msg = "Integrity Constraint Violation\n"
+            err_msg += "Details:\n"
+            err_msg += err.message
+            raise ImportError(err_msg)
 
     book.save()
 
@@ -77,7 +84,7 @@ def check_id_alias_conflict(book_element):
 
     candidate_id = book_element.get('id')
 
-    # Find all the aliase of all the books that are not this book.
+    # Find all the aliases of all the books that are not this book.
     possible_aliases = Alias.objects.exclude(book__pk=candidate_id)
 
     import_errors = []
