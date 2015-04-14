@@ -12,26 +12,12 @@ def process_book_element(book_element):
     :param book: book element
     :returns:
     """
-    try:
-        validate_book_element(book_element)
-    except ImportError as err:
-        print("Error when importing book id {} Title '{}'".format(
-                book_element.get('id'),
-                book_element.findtext('title'),
-            )
-        )
-        print("Error details {}".format(err.message))
-        # No further processing of this book
-        return
-
+    validate_book_element(book_element)
     book, created = Book.objects.get_or_create(pk=book_element.get('id'))
     book.title = book_element.findtext('title')
     book.description = book_element.findtext('description')
 
-    for alias in book_element.xpath('aliases/alias'):
-        scheme = alias.get('scheme')
-        value = alias.get('value')
-
+    for scheme, value in iter_aliases(book_element):
         book.aliases.get_or_create(scheme=scheme, value=value)
 
     book.save()
@@ -61,4 +47,60 @@ def validate_book_element(book_element):
     :param book: book element
     :returns:
     """
-    return
+    list_of_conflict_messages = []
+    list_of_conflict_messages.extend(check_id_id_conflict(book_element))
+    list_of_conflict_messages.extend(check_id_alias_conflict(book_element))
+    list_of_conflict_messages.extend(check_alias_id_conflict(book_element))
+    list_of_conflict_messages.extend(check_alias_alias_conflict(book_element))
+
+    if list_of_conflict_messages:
+        err_msg = "Conflicts\n"
+        err_msg += "\n".join(list_of_conflict_messages)
+        raise ImportError(err_msg)
+
+def check_id_id_conflict(book_element):
+    """
+    Return a list of error messages if book_element has an id that conflicts
+    with an existing book id in the database.
+    """
+    return []
+
+def check_id_alias_conflict(book_element):
+    """
+    Return a list of error messages if book_element has an id that conflicts
+    with an existing book alias in the database.
+    """
+    return []
+
+def check_alias_id_conflict(book_element):
+    """
+    Return a list of error messages if book_element has an alias that conflicts
+    with an existing book id in the database.
+    """
+    return []
+
+def check_alias_alias_conflict(book_element):
+    """
+    Return a list of error messages if book_element has an alias that conflicts
+    with an existing book in the database.
+    """
+    return []
+
+def check_id_conflict(candidate_data):
+    """
+    Return a list of error messages if candidate_data conflicts with an existing
+    book id in the database.
+    """
+    return []
+
+def check_alias_conflict(candidate_data):
+    """
+    Return a list of error messages if candidate_data conflicts with an existing
+    book alias in the database.
+    """
+    return []
+
+class ImportError(Exception):
+    """
+    Custom error to throw when a publisher record can not be imported.
+    """

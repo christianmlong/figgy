@@ -17,4 +17,8 @@ class Command(BaseCommand):
             with open(filename, 'rb') as fh:
                 print "Importing %s into database." % filename
                 book_node = etree.parse(fh).getroot()
-                storage.tools.process_book_element(book_node)
+                try:
+                    storage.tools.process_book_element(book_node)
+                except storage.tools.ImportError as err:
+                    print "Error when importing %s into database." % filename
+                    print("Error details {}".format(err.message))

@@ -26,17 +26,14 @@ Problems with the data
 
 Book 1
 Book ID changes from "book-1" to 10000000000001
-Version changes from 1 to 2
 Add a Proprietary alias of 12345ABC
 
 Book 2
-Version changes from 1 to 2
 Adds alias Proprietary, Unknown Type 12345ABC
 Adds an ISBN-13 alias that conflicts with book 1 alias and with book 1 isbn number
 
 Book 3
 Id changes from book-3 to 12345ABC. This conflicts with book 1 alias and book 2 alias
-No version number in update
 
 Solutions
 
@@ -56,6 +53,10 @@ If a collision is found, print an informative error, and skip that record.
 More elaborate solution:
 Create a model for publisher record: Date, status, errore message, xml
 Import all the updates in to a batch of publisher records
-Validate the whole batch, looking for conflicts before import
-Import the batch. Any publisher records that cause errors are rolled back, and get an error message.
+Validate the whole batch. Before import, notify the user of any conflicts.
+Import the batch. Any publisher records that cause errors are rolled back. Notify the user of any errors.
 Provide a view to display errors and conflicts in publisher imports, and a way to resolve them.
+Handle the case when a book id changes. Notify the user and allow them to delete the old record unser the old id.
+Better handling of version numbers. Create an internal version number that is automatically incremented. Record the version number that the publisher sends, but don't rely on it for anything.
+MOAR TESTS
+What happens when a book id changes, and the new id matches an existing id? How can we tell the difference between that and a regular update? Perhaps take a measurement of percent of data that is going to change, and flag any cases where that is above some threshhold.
