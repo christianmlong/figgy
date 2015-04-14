@@ -37,3 +37,22 @@ class TestTools(TestCase):
         self.assertEqual(Alias.objects.get(scheme='ISBN-10').value, '0158757819')
         self.assertEqual(Alias.objects.get(scheme='ISBN-13').value, '0000000000123')
 
+    def test_iter_aliases(self):
+        '''iter_aliases should provide an iterator over the aliases'''
+
+        xml = etree.fromstring(self.xml_str)
+        aliases = storage.tools.iter_aliases(xml)
+        scheme, value = aliases.next()
+        self.assertEqual(scheme, 'ISBN-10')
+        self.assertEqual(value, '0158757819')
+        scheme, value = aliases.next()
+        self.assertEqual(scheme, 'ISBN-13')
+        self.assertEqual(value, '0000000000123')
+        with self.assertRaises(StopIteration):
+            aliases.next()
+
+
+
+
+
+#
