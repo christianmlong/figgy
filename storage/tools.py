@@ -48,10 +48,10 @@ def validate_book_element(book_element):
     :returns:
     """
     list_of_conflict_messages = []
+    list_of_conflict_messages.extend(check_alias_uniqueness_violation(book_element))
     # list_of_conflict_messages.extend(check_id_id_conflict(book_element))
     list_of_conflict_messages.extend(check_id_alias_conflict(book_element))
     # list_of_conflict_messages.extend(check_alias_id_conflict(book_element))
-    # list_of_conflict_messages.extend(check_alias_alias_conflict(book_element))
 
     if list_of_conflict_messages:
         err_msg = "Conflicts\n"
@@ -69,6 +69,18 @@ def validate_book_element(book_element):
 #     """
 #     # TODO implement
 #     return []
+
+def check_alias_uniqueness_violation(book_element):
+    """
+    Make sure none of the imported aliases will conflict with existing aliases.
+    If any do, provide a friendly error message.
+    """
+    import_errors = []
+    for scheme, value in iter_aliases(book_element):
+        try:
+            existing_alias = Alias.objects.filter(scheme=scheme,
+                                                  value=value,
+                                                 )
 
 def check_id_alias_conflict(book_element):
     """

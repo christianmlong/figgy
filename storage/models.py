@@ -30,15 +30,20 @@ class Book(BaseModel):
 
 class Alias(BaseModel):
     '''
-    A book can have one or more aliases which
+    A book can have one or more aliases. The combination of scheme and value
+    must be unique.
 
     For example, a book can be referred to with an ISBN-10 (older, deprecated scheme), ISBN-13 (newer scheme),
     or any number of other aliases.
     '''
 
     book = models.ForeignKey(Book, related_name='aliases')
-    value = models.CharField(max_length=255, db_index=True, unique=True, help_text="The value of this identifier")
+    value = models.CharField(max_length=255, help_text="The value of this identifier")
     scheme = models.CharField(max_length=40, help_text="The scheme of identifier")
 
     def __unicode__(self):
         return '%s identifier for %s' % (self.scheme, self.book.title)
+
+    class Meta:
+        unique_together = ('value', 'scheme')
+        index_together = ['value', 'scheme']
