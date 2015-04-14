@@ -63,3 +63,35 @@ What happens when a book id changes, and the new id matches an existing id? How 
 Handle cases where a string id conflicts with an int id. Handle leading and trailing whitespace.
 Currently, I'm checking the imported book's id against all the aliases of the other books in the database. In addition, check each alias against exsiting ids, and check each alias against existing aliases.
 I changed the Alias model so that it requires the combination of scheme and value to be unique. I also madse that a compund index. The application may require a non-unique index just on value.
+
+
+Result
+
+With the changes I made, when I run this:
+
+python manage.py process_data_file data/update/*.xml
+
+I get this:
+
+Importing data/update/update-1.xml into database.
+Error when importing data/update/update-1.xml into database.
+Error details Conflicts
+Imported data 1000000000001 conflicts with existing alias (scheme ISBN-13 value 1000000000001) for book id book-1
+
+
+
+Importing data/update/update-2.xml into database.
+Error when importing data/update/update-2.xml into database.
+Error details Integrity Constraint Violation
+Details:
+UNIQUE constraint failed: storage_alias.value, storage_alias.scheme
+
+
+
+Importing data/update/update-3.xml into database.
+Error when importing data/update/update-3.xml into database.
+Error details Conflicts
+Imported data 12345ABC conflicts with existing alias (scheme Proprietary, Unknown type value 12345ABC) for book id book-2
+
+
+When importing book 1, it should match on the ISBN alias instead of creating a new book entry.
