@@ -61,3 +61,4 @@ Better handling of version numbers. Create an internal version number that is au
 MOAR TESTS
 What happens when a book id changes, and the new id matches an existing id? How can we tell the difference between that and a regular update? Perhaps take a measurement of percent of data that is going to change, and flag any cases where that is above some threshhold.
 Handle cases where a string id conflicts with an int id. Handle leading and trailing whitespace.
+Currently, I'm checking the imported book's id against all the aliases of the other books in the database. In addition, check each alias against exsiting ids, and check each alias against existing aliases.

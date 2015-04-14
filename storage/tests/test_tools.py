@@ -10,7 +10,7 @@ import storage.tools
 
 class TestTools(TestCase):
 
-    xml_str = '''
+    common_xml_str = '''
     <book id="12345">
         <title>A title</title>
         <aliases>
@@ -26,7 +26,7 @@ class TestTools(TestCase):
     def test_storage_tools_process_book_element_db(self):
         '''process_book_element should put the book in the database.'''
 
-        xml = etree.fromstring(self.xml_str)
+        xml = etree.fromstring(self.common_xml_str)
         storage.tools.process_book_element(xml)
 
         self.assertEqual(Book.objects.count(), 1)
@@ -40,7 +40,18 @@ class TestTools(TestCase):
     def test_storage_tools_process_book_element_idempotent(self):
         '''process_book_element should be idempotent.'''
 
-        xml = etree.fromstring(self.xml_str)
+        xml_str = '''
+        <book id="12345">
+            <title>A title</title>
+            <aliases>
+                <alias scheme="ISBN-10" value="0158757819"/>
+                <alias scheme="ISBN-13" value="0000000000123"/>
+                <alias scheme="Publisher Id" value="12345"/>
+            </aliases>
+        </book>
+        '''
+
+        xml = etree.fromstring(xml_str)
         storage.tools.process_book_element(xml)
         # Do it again
         storage.tools.process_book_element(xml)
@@ -51,7 +62,7 @@ class TestTools(TestCase):
     def test_iter_aliases(self):
         '''iter_aliases should provide an iterator over the aliases'''
 
-        xml = etree.fromstring(self.xml_str)
+        xml = etree.fromstring(self.common_xml_str)
         aliases = storage.tools.iter_aliases(xml)
         scheme, value = aliases.next()
         self.assertEqual(scheme, 'ISBN-10')
@@ -65,7 +76,7 @@ class TestTools(TestCase):
     def test_storage_tools_check_id_alias_conflict(self):
         '''check_id_alias_conflict should catch conflicts'''
 
-        xml = etree.fromstring(self.xml_str)
+        xml = etree.fromstring(self.common_xml_str)
         storage.tools.process_book_element(xml)
 
         xml_str_with_conflict = '''

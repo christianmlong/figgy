@@ -50,8 +50,8 @@ def validate_book_element(book_element):
     list_of_conflict_messages = []
     # list_of_conflict_messages.extend(check_id_id_conflict(book_element))
     list_of_conflict_messages.extend(check_id_alias_conflict(book_element))
-    list_of_conflict_messages.extend(check_alias_id_conflict(book_element))
-    list_of_conflict_messages.extend(check_alias_alias_conflict(book_element))
+    # list_of_conflict_messages.extend(check_alias_id_conflict(book_element))
+    # list_of_conflict_messages.extend(check_alias_alias_conflict(book_element))
 
     if list_of_conflict_messages:
         err_msg = "Conflicts\n"
@@ -95,33 +95,21 @@ def check_id_alias_conflict(book_element):
             import_errors.append(err_msg)
     return import_errors
 
-def check_alias_id_conflict(book_element):
-    """
-    Return a list of error messages if book_element has an alias that conflicts
-    with an existing book id in the database.
-    """
-    return []
+# TODO implement these checks
+# def check_alias_id_conflict(book_element):
+#     """
+#     Return a list of error messages if book_element has an alias that conflicts
+#     with an existing book id in the database.
+#     """
+#     return []
 
-def check_alias_alias_conflict(book_element):
-    """
-    Return a list of error messages if book_element has an alias that conflicts
-    with an existing book in the database.
-    """
-    return []
+# def check_alias_alias_conflict(book_element):
+#     """
+#     Return a list of error messages if book_element has an alias that conflicts
+#     with an existing book in the database.
+#     """
+#     return []
 
-def check_id_conflict(candidate_data):
-    """
-    Return a list of error messages if candidate_data conflicts with an existing
-    book id in the database.
-    """
-    return []
-
-def check_alias_conflict(candidate_data):
-    """
-    Return a list of error messages if candidate_data conflicts with an existing
-    book alias in the database.
-    """
-    return []
 
 class ImportError(Exception):
     """
